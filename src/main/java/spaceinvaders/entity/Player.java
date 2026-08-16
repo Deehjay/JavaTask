@@ -78,6 +78,10 @@ public class Player
         return playerSprite.getX();
     }
 
+    public double getPlayerCentreX() { return playerSprite.getX() + playerSprite.getFitHeight() / 2; }
+
+    public double getPlayerPositionY() { return playerSprite.getY(); }
+
     public void setPlayerPositionX(double newPositionX)
     {
         playerSprite.setX(newPositionX);

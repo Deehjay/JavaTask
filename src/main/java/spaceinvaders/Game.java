@@ -1,5 +1,8 @@
 package spaceinvaders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -7,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import spaceinvaders.core.GameLoop;
+import spaceinvaders.entity.Bullet;
 import spaceinvaders.entity.Player;
 import spaceinvaders.ui.PerformanceTracker;
 
@@ -23,6 +27,8 @@ public class Game
     private Player player;
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
+
+    private final List<Bullet> bullets = new ArrayList<>();
 
     public Game(Stage stage)
     {
@@ -49,6 +55,7 @@ public class Game
                 WINDOW_HEIGHT
         );
 
+        // Listening events for keystrokes
         scene.setOnKeyPressed(event ->
         {
             switch (event.getCode())
@@ -60,6 +67,11 @@ public class Game
                 case D:
                     isMovingRight = true;
                     break;
+
+                case SPACE:
+                    Bullet bullet = new Bullet(player.getPlayerCentreX(), player.getPlayerPositionY());
+                    bullets.add(bullet);
+                    root.getChildren().add(bullet.getBulletShape());
             }
         });
 
@@ -77,6 +89,7 @@ public class Game
             }
         });
 
+        // Game window config
         stage.setTitle("Space Invaders Clone Thingy");
         stage.setResizable(false);
         stage.setScene(scene);
@@ -107,6 +120,10 @@ public class Game
             public void update()
             {
                 player.update(isMovingLeft, isMovingRight);
+                for (Bullet bullet : bullets)
+                {
+                    bullet.update();
+                }
             }
 
             @Override

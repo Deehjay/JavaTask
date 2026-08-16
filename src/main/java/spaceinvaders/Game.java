@@ -7,6 +7,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import spaceinvaders.core.GameLoop;
+import spaceinvaders.entity.Player;
 import spaceinvaders.ui.PerformanceTracker;
 
 public class Game
@@ -18,6 +19,11 @@ public class Game
 
     private PerformanceTracker performanceTracker;
 
+
+    private Player player;
+    private boolean isMovingLeft = false;
+    private boolean isMovingRight = false;
+
     public Game(Stage stage)
     {
         this.stage = stage;
@@ -26,15 +32,15 @@ public class Game
     public void start()
     {
         Pane root = new Pane();
-
+        player = new Player(WINDOW_HEIGHT, WINDOW_WIDTH);
         ImageView background = createBackground();
-        ImageView player = createPlayer();
+
 
         performanceTracker = new PerformanceTracker();
 
         // Assets must be added to the root in layered order, so background must be added first
         root.getChildren().add(background);
-        root.getChildren().add(player);
+        root.getChildren().add(player.getPlayerSprite());
         root.getChildren().add(performanceTracker.getPerformanceLabel());
 
         Scene scene = new Scene(
@@ -42,6 +48,34 @@ public class Game
                 WINDOW_WIDTH,
                 WINDOW_HEIGHT
         );
+
+        scene.setOnKeyPressed(event ->
+        {
+            switch (event.getCode())
+            {
+                case A:
+                    isMovingLeft = true;
+                    break;
+
+                case D:
+                    isMovingRight = true;
+                    break;
+            }
+        });
+
+        scene.setOnKeyReleased(event ->
+        {
+            switch (event.getCode())
+            {
+                case A:
+                    isMovingLeft = false;
+                    break;
+
+                case D:
+                    isMovingRight = false;
+                    break;
+            }
+        });
 
         stage.setTitle("Space Invaders Clone Thingy");
         stage.setResizable(false);
@@ -65,24 +99,6 @@ public class Game
         return background;
     }
 
-    // Creates the player sprite by loading it from the resources folder
-    private ImageView createPlayer()
-    {
-        Image playerImage = new Image(getClass().getResourceAsStream("/sprites/player-ship.png"));
-
-        ImageView player = new ImageView(playerImage);
-
-        // Display the player as a 64x64 sprite
-        player.setFitWidth(64);
-        player.setFitHeight(64);
-
-        // Position the player near the bottom-centre of the screen
-        player.setX((WINDOW_WIDTH / 2.0) - 32); // Offset required (half of sprite size)
-        player.setY(WINDOW_HEIGHT - 64);
-
-        return player;
-    }
-
     private void startGameLoop()
     {
         GameLoop gameLoop = new GameLoop()
@@ -90,7 +106,7 @@ public class Game
             @Override
             public void update()
             {
-
+                player.update(isMovingLeft, isMovingRight);
             }
 
             @Override
